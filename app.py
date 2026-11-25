@@ -223,9 +223,16 @@ def judge_tool(case, tool, env, users):
 
 @app.route("/", methods=["POST"])
 @app.route("/classify", methods=["POST"])
+@app.route("/", methods=["POST"])
+@app.route("/classify", methods=["POST"])
 def handle():
     data = request.get_json(force=True)
-    results = [classify(c) for c in data.get("cases", [])]
+    results = []
+    for c in data.get("cases", []):
+        res = classify(c)
+        results.append(res)
+        # one line per case: full input + what we answered
+        print("CASE " + json.dumps(c, default=str) + " ==> " + json.dumps(res), flush=True)
     return jsonify(profile=data.get("profile"), batchId=data.get("batchId"), results=results)
 
 @app.route("/", methods=["GET"])
